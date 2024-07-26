@@ -1,0 +1,23 @@
+GET http://localhost:3333/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUGVkcm8iLCJpYXQiOjE3MjE2ODM5MTh9.oMZBzfBn24MqONBNINhWpeHjA8Av64l2oJlDVPcMaRE
+
+###
+
+POST http://localhost:3333/users
+Content-Type: application/json
+
+{
+    "name": "Pedro",
+    "email": "pedro@mail.com",
+    "password": "password"
+}
+
+###
+
+POST http://localhost:3333/users/login
+Content-Type: application/json
+
+{
+    "name": "Pedro",
+    "password": "password"
+}
