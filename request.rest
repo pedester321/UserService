@@ -7,17 +7,17 @@ POST http://localhost:3333/users
 Content-Type: application/json
 
 {
-    "name": "Pedro",
-    "email": "pedro@mail.com",
-    "password": "password"
+    "name": "Test",
+    "email": "e@mail.com",
+    "password": "123321"
 }
 
 ###
 
-POST http://localhost:3333/users/login
+POST http://localhost:3333/login
 Content-Type: application/json
 
 {
-    "name": "Pedro",
-    "password": "password"
+    "email": "e@mail.com",
+    "password": "123321"
 }

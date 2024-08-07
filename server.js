@@ -31,18 +31,24 @@ app.post('/users', async (req, res) => {
 
 
 //Login
-app.post('/users/login', async (req, res) => {
-    const user = users.find(user => user.name = req.body.name)
+app.post('/login', async (req, res) => {
+    const user = await readUser(req.body.email)
+    
+    console.log(user[0].password)
     if (user == null) {
         return res.status(400).send('Cannot find user')
     }
     try {
-        if (await bcrypt.compare(req.body.password, user.password)) {
+        if (await bcrypt.compare(req.body.password, user[0].password)) {
+[0]
+            const payload ={
+                id: user[0].id,
+                name: user[0].name,
+                email: user[0].email
+            }
+            const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
 
-            const userData = { name: user.name }
-
-            const accessToken = jwt.sign(userData, process.env.ACCESS_TOKEN_SECRET)
-            res.json({ accessToken: accessToken })
+            res.json({ token: token })
         } else {
             res.send('Not Allowed').send()
         }
