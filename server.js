@@ -3,7 +3,7 @@ require('dotenv').config()
 const { createUser, readUser, updateUser, deleteUser } = require('./db');
 const express = require('express')
 const app = express()
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 app.use(express.json())
@@ -34,7 +34,6 @@ app.post('/users', async (req, res) => {
 app.post('/login', async (req, res) => {
     const user = await readUser(req.body.email)
 
-    console.log(user[0].password)
     if (user == null) {
         return res.status(400).send('Cannot find user')
     }
