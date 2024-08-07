@@ -10,7 +10,7 @@ app.use(express.json())
 
 const users = []
 
-app.get('/users', tokenAuth ,(req, res) => {
+app.get('/users', tokenAuth, (req, res) => {
     res.json(users)
 })
 
@@ -21,10 +21,10 @@ app.post('/users', async (req, res) => {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
-        const user = { name: req.body.name,email: req.body.email, password: hashedPassword }
+        const user = { name: req.body.name, email: req.body.email, password: hashedPassword }
         createUser(user)
         res.status(201).send()
-    } catch(err) {
+    } catch (err) {
         res.status(500).send(err)
     }
 })
@@ -33,15 +33,15 @@ app.post('/users', async (req, res) => {
 //Login
 app.post('/login', async (req, res) => {
     const user = await readUser(req.body.email)
-    
+
     console.log(user[0].password)
     if (user == null) {
         return res.status(400).send('Cannot find user')
     }
     try {
         if (await bcrypt.compare(req.body.password, user[0].password)) {
-[0]
-            const payload ={
+            [0]
+            const payload = {
                 id: user[0].id,
                 name: user[0].name,
                 email: user[0].email
@@ -69,4 +69,9 @@ function tokenAuth(req, res, next) {
     })
 }
 
-app.listen(3333)
+app.listen(
+    {
+        host: '0.0.0.0',
+        port: process.env.PORT ?? 3333,
+    },
+)
