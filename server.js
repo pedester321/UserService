@@ -5,6 +5,10 @@ const express = require('express')
 const app = express()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(express.json())
 
@@ -22,7 +26,7 @@ app.post('/users', async (req, res) => {
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
         const user = { name: req.body.name, email: req.body.email, password: hashedPassword }
-        createUser(user)
+        await createUser(user)
         res.status(201).send()
     } catch (err) {
         res.status(500).send(err)
@@ -34,7 +38,7 @@ app.post('/users', async (req, res) => {
 app.post('/login', async (req, res) => {
     const user = await readUser(req.body.email)
 
-    if (user == null) {
+    if (user[0] == null) {
         return res.status(400).send('Cannot find user')
     }
     try {
