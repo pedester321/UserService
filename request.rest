@@ -3,13 +3,37 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUGVkcm8iL
 
 ###
 
-POST http://localhost:3333/users
+POST http://localhost:3333/collectors
 Content-Type: application/json
 
 {
-    "name": "Test",
-    "email": "e@mail.com",
-    "password": "123321"
+    "name": "Pedro",
+    "email": "pedro@email.com",
+    "password": "123321",
+    "birthdate": "1995-07-14"
+}
+
+###
+
+Put http://localhost:3333/collectors
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlBlZHJvIiwiZW1haWwiOiJwZWRyb0BlbWFpbC5jb20iLCJiaXJ0aERhdGUiOiIxOTk1LTA3LTE0VDAwOjAwOjAwLjAwMFoiLCJpYXQiOjE3MjMzMjgwNDB9.PDJCet-uvDRQkD3qpgQe89nJISBbm0h6DKPcn5t6qE4
+Content-Type: application/json
+
+{
+    "name": "Pedro Rogerio",
+    "email": "pedro@email.com",
+    "password": "123321",
+    "birthdate": "1995-07-14"
+}
+
+###
+
+DELETE http://localhost:3333/collectors
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlBlZHJvIiwiZW1haWwiOiJwZWRyb0BlbWFpbC5jb20iLCJiaXJ0aERhdGUiOiIxOTk1LTA3LTE0VDAwOjAwOjAwLjAwMFoiLCJpYXQiOjE3MjMzMjgwNDB9.PDJCet-uvDRQkD3qpgQe89nJISBbm0h6DKPcn5t6qE4
+Content-Type: application/json
+
+{
+    "email": "pedro@email.com"
 }
 
 ###
@@ -18,6 +42,6 @@ POST http://localhost:3333/login
 Content-Type: application/json
 
 {
-    "email": "e@mail.com",
+    "email": "pedro@email.com",
     "password": "123321"
 }

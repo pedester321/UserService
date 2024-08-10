@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const { createUser, readUser, updateUser, deleteUser } = require('./db');
+const { createCollector, readCollector, updateCollector, deleteCollector } = require('./db');
 const express = require('express')
 const app = express()
 const bcrypt = require('bcryptjs')
@@ -12,42 +12,59 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(express.json())
 
-const users = []
-
-app.get('/users', tokenAuth, (req, res) => {
-    res.json(users)
-})
-
-
 //Sign Up
-app.post('/users', async (req, res) => {
+app.post('/collectors', async (req, res) => {
     try {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
-        const user = { name: req.body.name, email: req.body.email, password: hashedPassword }
-        await createUser(user)
+        const collector = { name: req.body.name, email: req.body.email, password: hashedPassword, birthdate: req.body.birthdate }
+        await createCollector(collector)
         res.status(201).send()
     } catch (err) {
         res.status(500).send(err)
     }
 })
 
+//Update Collector
+app.put('/collectors', tokenAuth, async (req, res) =>{
+    try {
+        const salt = await bcrypt.genSalt()
+        const hashedPassword = await bcrypt.hash(req.body.password, salt)
+
+        const collector = { name: req.body.name, email: req.body.email, password: hashedPassword, birthdate: req.body.birthdate }
+        await updateCollector(collector)
+        res.status(200).send()
+    } catch (err) {
+        res.status(500).send(err)
+    }
+})
+
+//Delete Collector
+app.delete('/collectors', tokenAuth, async (req, res) =>{
+    try {
+        await deleteCollector(req.body.email)
+        res.status(204).send()
+    } catch (err) {
+        res.status(500).send(err)
+    }
+})
 
 //Login
 app.post('/login', async (req, res) => {
-    const user = await readUser(req.body.email)
+    const collector = await readCollector(req.body.email)
 
-    if (user[0] == null) {
+    if (collector[0] == null) {
         return res.status(400).send('Cannot find user')
     }
     try {
-        if (await bcrypt.compare(req.body.password, user[0].password)) {
+        if (await bcrypt.compare(req.body.password, collector[0].password)) {
             [0]
             const payload = {
-                id: user[0].id,
-                name: user[0].name,
-                email: user[0].email
+                id: collector[0].id,
+                name: collector[0].name,
+                email: collector[0].email,
+                birthDate: collector[0].birthdate
             }
             const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
 
@@ -60,6 +77,8 @@ app.post('/login', async (req, res) => {
     }
 })
 
+
+//Middleware de auth
 function tokenAuth(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]

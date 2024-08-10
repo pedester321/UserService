@@ -1,101 +1,158 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "userService",
-      "version": "1.0.0",
-      "description": "An auth API"
-    },
-    "servers": [
-      {
-        "url": "https://userservice-qeo1.onrender.com",
-        "description": "auth endpoint"
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Collector Service",
+    "version": "1.0.0",
+    "description": "Serviço para gerenciar colecionadores"
+  },
+  "servers": [
+    {
+      "url": "https://userservice-qeo1.onrender.com"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
-    ],
-    "paths": {
-      "/login": {
-        "post": {
-          "summary": "Login a user",
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "email": {
-                      "type": "string"
-                    },
-                    "password": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["email", "password"]
+    }
+  },
+  "paths": {
+    "/collectors": {
+      "post": {
+        "summary": "Cadastrar um novo colecionador",
+        "description": "Cria um novo colecionador com nome, email, senha e data de nascimento.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "birthdate": { "type": "string", "format": "date" }
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Colecionador criado com sucesso"
           },
-          "responses": {
-            "200": {
-              "description": "Successful login",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "token": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Cannot find user"
-            },
-            "401": {
-              "description": "Not Allowed"
-            },
-            "500": {
-              "description": "Internal server error"
-            }
+          "500": {
+            "description": "Erro no servidor"
           }
         }
       },
-      "/users": {
-        "post": {
-          "summary": "Create a new user",
-          "requestBody": {
-            "required": true,
+      "put": {
+        "summary": "Atualizar um colecionador",
+        "description": "Atualiza as informações de um colecionador existente.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "birthdate": { "type": "string", "format": "date" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Colecionador atualizado com sucesso"
+          },
+          "500": {
+            "description": "Erro no servidor"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Excluir um colecionador",
+        "description": "Exclui um colecionador existente com base no email.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Colecionador excluído com sucesso"
+          },
+          "500": {
+            "description": "Erro no servidor"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Login de colecionador",
+        "description": "Realiza login de um colecionador e retorna um token JWT.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string"
-                    },
-                    "password": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["name", "email", "password"]
+                    "token": { "type": "string" }
+                  }
                 }
               }
             }
           },
-          "responses": {
-            "201": {
-              "description": "User created successfully"
-            },
-            "500": {
-              "description": "Internal server error"
-            }
+          "400": {
+            "description": "Usuário não encontrado"
+          },
+          "500": {
+            "description": "Erro no servidor"
           }
         }
       }
     }
   }
+}

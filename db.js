@@ -1,33 +1,33 @@
 const sql = require('./databaseConnection')
 
-async function createUser(user){
-    const{name, email, password } = user
+async function createCollector(collector){
+    const{name, email, password, birthdate } = collector
     await sql`
-    insert into users (name, email, password) 
-    values (${name}, ${email}, ${password})
+    insert into collectors (name, email, password, birthdate) 
+    values (${name}, ${email}, ${password}, ${birthdate})
     `;
 }
 
-async function readUser(email){
-    return await sql`select * from users where email = ${email}`;
+async function readCollector(email){
+    return await sql`select * from collectors where email = ${email}`;
 }
 
-async function updateUser(id, user){
-    const{name, email, password } = user
+async function updateCollector(collector){
+    const{name, email, password, birthdate } = collector
     await sql`
-    update users set name = ${name}, email = ${email}, password = ${password} where id = ${id}
+    update collectors set name = ${name}, email = ${email}, password = ${password}, birthdate = ${birthdate} where email = ${email}
     `
 }
 
-async function deleteUser(id){
+async function deleteCollector(email){
     await sql`
-    DELETE FROM users WHERE email = ${id}
+    DELETE FROM collectors WHERE email = ${email}
     `;
 }
 
 module.exports = {
-    createUser,
-    readUser,
-    updateUser,
-    deleteUser
+    createCollector,
+    readCollector,
+    updateCollector,
+    deleteCollector
 }
