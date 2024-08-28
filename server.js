@@ -59,7 +59,7 @@ app.post('/login', async (req, res) => {
     }
     try {
         if (await bcrypt.compare(req.body.password, collector[0].password)) {
-            [0]
+            
             const payload = {
                 id: collector[0].id,
                 name: collector[0].name,
@@ -70,7 +70,7 @@ app.post('/login', async (req, res) => {
 
             res.json({ token: token })
         } else {
-            res.send('Not Allowed').send()
+            res.send(401).send('Not Allowed')
         }
     } catch {
         res.status(500).send()
