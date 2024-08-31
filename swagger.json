@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Collector Service",
+    "title": "User Service",
     "version": "1.0.0",
-    "description": "Serviço para gerenciar colecionadores"
+    "description": "Serviço para gerenciar usuários"
   },
   "servers": [
     {
@@ -20,10 +20,10 @@
     }
   },
   "paths": {
-    "/collectors": {
+    "/users": {
       "post": {
-        "summary": "Cadastrar um novo colecionador",
-        "description": "Cria um novo colecionador com nome, email, senha e data de nascimento.",
+        "summary": "Cadastrar um novo usuário",
+        "description": "Cria um novo usuário com nome, email, senha e data de nascimento.",
         "requestBody": {
           "required": true,
           "content": {
@@ -42,7 +42,7 @@
         },
         "responses": {
           "201": {
-            "description": "Colecionador criado com sucesso"
+            "description": "Usuário criado com sucesso"
           },
           "500": {
             "description": "Erro no servidor"
@@ -50,8 +50,8 @@
         }
       },
       "put": {
-        "summary": "Atualizar um colecionador",
-        "description": "Atualiza as informações de um colecionador existente.",
+        "summary": "Atualizar um usuário",
+        "description": "Atualiza as informações de um usuário existente.",
         "security": [
           {
             "BearerAuth": []
@@ -75,7 +75,7 @@
         },
         "responses": {
           "200": {
-            "description": "Colecionador atualizado com sucesso"
+            "description": "Usuário atualizado com sucesso"
           },
           "500": {
             "description": "Erro no servidor"
@@ -83,8 +83,8 @@
         }
       },
       "delete": {
-        "summary": "Excluir um colecionador",
-        "description": "Exclui um colecionador existente com base no email.",
+        "summary": "Excluir um usuário",
+        "description": "Exclui um usuário existente com base no email.",
         "security": [
           {
             "BearerAuth": []
@@ -105,7 +105,7 @@
         },
         "responses": {
           "204": {
-            "description": "Colecionador excluído com sucesso"
+            "description": "Usuário excluído com sucesso"
           },
           "500": {
             "description": "Erro no servidor"
@@ -115,8 +115,8 @@
     },
     "/login": {
       "post": {
-        "summary": "Login de colecionador",
-        "description": "Realiza login de um colecionador e retorna um token JWT.",
+        "summary": "Login de usuário",
+        "description": "Realiza login de um usuário e retorna um token JWT.",
         "requestBody": {
           "required": true,
           "content": {
@@ -146,6 +146,37 @@
             }
           },
           "400": {
+            "description": "Usuário não encontrado"
+          },
+          "500": {
+            "description": "Erro no servidor"
+          }
+        }
+      }
+    },
+    "/confirm-email": {
+      "get": {
+        "summary": "Confirmar e-mail do usuário",
+        "description": "Confirma o e-mail de um usuário com base no token de confirmação.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Token de confirmação de e-mail"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "E-mail confirmado com sucesso"
+          },
+          "400": {
+            "description": "Token inválido ou expirado"
+          },
+          "404": {
             "description": "Usuário não encontrado"
           },
           "500": {
