@@ -1,6 +1,7 @@
 require('dotenv').config()
 
-const { createCollector, readCollector, updateCollector, deleteCollector } = require('./db');
+const { createUser, readUserByEmail, updateUser, deleteUser, updateUserEmailConfirmed } = require('./db');
+const { sendConfirmationEmail} = require('./email_client')
 const express = require('express')
 const app = express()
 const bcrypt = require('bcryptjs')
@@ -13,27 +14,88 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json())
 
 //Sign Up
-app.post('/collectors', async (req, res) => {
+app.post('/users', async (req, res) => {
     try {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
-        const collector = { name: req.body.name, email: req.body.email, password: hashedPassword, birthdate: req.body.birthdate }
-        await createCollector(collector)
+        const payload = {
+            type: "email_confirmation",
+            email: req.body.email
+        }
+
+        const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
+        //TODO: send email
+
+        const user = { 
+            name: req.body.name,
+            email: req.body.email, 
+            password: hashedPassword, 
+            birthdate: req.body.birthdate,
+            confirmationToken: token
+        }
+
+        await createUser(user)
+        await sendConfirmationEmail(user)
         res.status(201).send()
     } catch (err) {
         res.status(500).send(err)
     }
 })
 
+//Confirm Email
+app.get('/confirm-email', async (req, res) =>{
+    const token = req.query.token
+
+    if (!token) {
+        return res.status(400).send('Token não fornecido.');
+      }
+    
+      try {
+        // Verifica o token
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    
+        // Verifica se o token tem o propósito correto
+        if (decoded.type !== 'email_confirmation') {
+          return res.status(400).send('Tipo de token inválido.');
+        }
+    
+        // Busca o usuário no banco de dados pelo e-mail
+        const user = await readUserByEmail(decoded.email);
+        if (!user) {
+          return res.status(404).send('Usuário não encontrado.');
+        }
+    
+        // Verifica se o e-mail já foi confirmado
+        if (user.email_confirmed) {
+          return res.status(400).send('E-mail já confirmado.');
+        }
+    
+        // Atualiza o status do usuário para e-mail confirmado
+        await updateUserEmailConfirmed(user.email);
+    
+        // Envia uma resposta de sucesso
+        res.send('E-mail confirmado com sucesso.');
+    
+      } catch (err) {
+        console.error(err);
+        return res.status(400).send('Token inválido ou expirado.');
+      }
+})
+
 //Update Collector
-app.put('/collectors', tokenAuth, async (req, res) =>{
+app.put('/users', tokenAuth, async (req, res) =>{
     try {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
-        const collector = { name: req.body.name, email: req.body.email, password: hashedPassword, birthdate: req.body.birthdate }
-        await updateCollector(collector)
+        const user = { 
+            name: req.body.name,
+            email: req.body.email, 
+            password: hashedPassword, 
+            birthdate: req.body.birthdate 
+        }
+        await updateUser(user)
         res.status(200).send()
     } catch (err) {
         res.status(500).send(err)
@@ -41,9 +103,9 @@ app.put('/collectors', tokenAuth, async (req, res) =>{
 })
 
 //Delete Collector
-app.delete('/collectors', tokenAuth, async (req, res) =>{
+app.delete('/users', tokenAuth, async (req, res) =>{
     try {
-        await deleteCollector(req.body.email)
+        await deleteUser(req.body.email)
         res.status(204).send()
     } catch (err) {
         res.status(500).send(err)
@@ -52,19 +114,22 @@ app.delete('/collectors', tokenAuth, async (req, res) =>{
 
 //Login
 app.post('/login', async (req, res) => {
-    const collector = await readCollector(req.body.email)
+    const user = await readUserByEmail(req.body.email)
 
-    if (collector[0] == null) {
+    if (user == null) {
         return res.status(400).send('Cannot find user')
     }
+    if (!user.email_confirmed){
+        return res.status(400).send('Please confirm you e-mail')
+    }
     try {
-        if (await bcrypt.compare(req.body.password, collector[0].password)) {
+        if (await bcrypt.compare(req.body.password, user.password)) {
             
             const payload = {
-                id: collector[0].id,
-                name: collector[0].name,
-                email: collector[0].email,
-                birthDate: collector[0].birthdate
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                birthDate: user.birthdate
             }
             const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
 

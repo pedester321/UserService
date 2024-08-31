@@ -1,33 +1,42 @@
 const sql = require('./databaseConnection')
 
-async function createCollector(collector){
-    const{name, email, password, birthdate } = collector
+async function createUser(user){
+    const{name, email, password, birthdate, confirmationToken } = user
     await sql`
-    insert into collectors (name, email, password, birthdate) 
-    values (${name}, ${email}, ${password}, ${birthdate})
+    insert into users (name, email, password, birth_date, confirmation_token) 
+    values (${name}, ${email}, ${password}, ${birthdate}, ${confirmationToken})
     `;
 }
 
-async function readCollector(email){
-    return await sql`select * from collectors where email = ${email}`;
+async function readUserByEmail(email){
+    const users = await sql`select * from users where email = ${email}`;
+    return users[0]
 }
 
-async function updateCollector(collector){
-    const{name, email, password, birthdate } = collector
+async function updateUser(user){
+    const{name, email, password, birthdate } = user
     await sql`
-    update collectors set name = ${name}, email = ${email}, password = ${password}, birthdate = ${birthdate} where email = ${email}
+    update users set name = ${name}, email = ${email}, password = ${password}, birthdate = ${birthdate} where email = ${email}
     `
 }
 
-async function deleteCollector(email){
+async function deleteUser(email){
     await sql`
-    DELETE FROM collectors WHERE email = ${email}
+    DELETE FROM users WHERE email = ${email}
     `;
 }
 
+async function updateUserEmailConfirmed(email){
+    
+    await sql`
+    update users set email_confirmed = true where email = ${email}
+    `
+}
+
 module.exports = {
-    createCollector,
-    readCollector,
-    updateCollector,
-    deleteCollector
+    createUser,
+    readUserByEmail,
+    updateUser,
+    deleteUser,
+    updateUserEmailConfirmed
 }
