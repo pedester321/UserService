@@ -135,6 +135,7 @@ app.post('/login', async (req, res) => {
                 name: user.name,
                 email: user.email,
                 birthDate: user.birth_date,
+                emailConfirmed: user.email_confirmed,
                 role: user.role
             }
             const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
