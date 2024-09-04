@@ -13,6 +13,11 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(express.json())
 
+app.get('/', async (req, res) =>{
+    
+    return res.send('userService');     
+})
+
 //Sign Up
 app.post('/users', async (req, res) => {
     try {
